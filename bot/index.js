@@ -23,6 +23,8 @@ bot.on("message", msg => {
 });
 
 bot.on('guildMemberAdd', member => {
+    if(msg.author.bot) return;
+
     try {
         reddit.invoke(member, state.GUILD_MEMBER_ADD);
     } catch(e) {
@@ -35,6 +37,8 @@ bot.on('guildMemberAdd', member => {
 });
 
 bot.on('guildMemberRemove', member => {
+    if(msg.author.bot) return;
+
     try {
         reddit.invoke(member, state.GUILD_MEMBER_REMOVE);
     } catch(e) {
