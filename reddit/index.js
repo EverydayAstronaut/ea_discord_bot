@@ -2,7 +2,8 @@ const dotenv = require('dotenv');
 const botState = require('../bot/enum/state.js');
 const commands = require('./enum/command.js');
 const state = require('./enum/state.js');
-const Database = require('../bot/database.js');
+const sendCreatorMessage = require('../common/message.js');
+const Database = require('../common/database.js');
 const snoowrap = require('snoowrap');
 env = dotenv.config();
 
@@ -158,10 +159,11 @@ class Reddit {
         this.#subreddit.removeContributor({name: username}).then(_ => {
             callback(state.SUCCESS)
         }).catch(err => {
-            this.#sendCreatorMessage(
+            sendCreatorMessage(
+                this.#discord,
                 `ERROR REMOVING PERMISSIONS`
                 `the bot was unable to remove the reddit permissions of user ${author.id}`
-                );
+            )
             callback(state.FAILURE)
         });
     }
@@ -189,10 +191,11 @@ class Reddit {
             case state.FAILURE:
                 if(this.#attempts[username] == 3) {
                     msg.reply(":robot: Hmm something went wrong, I might be broken I have contacted my creator.");
-                    this.#sendCreatorMessage(
+                    sendCreatorMessage(
+                        this.#discord,
                         `ADD TO SUBREDDIT ERROR`,
                         `The bot has tried to subscribe someone for 3 times now. \nNo luck so far the user which tried to get access to the subreddit was ${msg.author.username}#${msg.author.discriminator} and his reddit account is ${username}`
-                        )
+                    )
                     this.#attempts[username] = 0;
                 } else {
                     msg.reply(":robot: Hmm something went wrong, perhaps the wrong username? Please try again.");
@@ -208,11 +211,6 @@ class Reddit {
                 this.#attempts[username] = 0;
                 break;
         }
-    }
-
-    #sendCreatorMessage = (title, msg) => {
-        const content = `\n\n***${title}*** \n${msg}`
-        this.#discord.guilds.cache.entries().next().value[1].members.cache.get("199157185320583168").send(content);
     }
 }
 
