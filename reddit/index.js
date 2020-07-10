@@ -173,7 +173,7 @@ class Reddit {
     }
 
     #validateMessage  = (cmd, username) => {
-        if(username == "" || username == "undefined") return false;
+        if(username == "" || username == "undefined" || username == undefined) return false;
         else if(cmd == "undefined") return false;
         else return true;
     }
