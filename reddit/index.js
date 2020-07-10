@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 const botState = require('../bot/enum/state.js');
 const commands = require('./enum/command.js');
 const state = require('./enum/state.js');
-const sendCreatorMessage = require('../common/message.js');
+const {sendCreatorMessage, removeMessage} = require('../common/message.js');
 const Database = require('../common/database.js');
 const snoowrap = require('snoowrap');
 env = dotenv.config();
@@ -68,7 +68,7 @@ class Reddit {
 
     #handleMessage = (msg) => {
         if(!msg.content.startsWith(process.env.PREFIX) || msg.channel.name != this.#channel_name) {
-            this.#removeMessage(msg);
+            removeMessage(msg, "COMMAND/CHANNEL");
             return;
         }
         
@@ -77,7 +77,7 @@ class Reddit {
         const username = parameters[1];
 
         if(!this.#validateMessage(cmd, username)) {
-            this.#removeMessage(msg);
+            removeMessage(msg, "USERNAME");
             return;
         } 
         
@@ -87,7 +87,7 @@ class Reddit {
         } else if(cmd == commands.RESUBSCRIBE) {
             this.#handleResubscribe(msg, username);
         } else {
-            this.#removeMessage(msg)
+            removeMessage(msg, "COMMAND")
         }
     }
 
@@ -166,10 +166,6 @@ class Reddit {
             )
             callback(state.FAILURE)
         });
-    }
-
-    #removeMessage = msg => {
-        msg.delete();
     }
 
     #validateMessage  = (cmd, username) => {
