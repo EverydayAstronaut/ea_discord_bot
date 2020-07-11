@@ -22,72 +22,41 @@ class Reddit {
 
     #subreddit = this.#reddit.getSubreddit("Subscriber_Reddit");
     #discord;
-    #channel_name = "reddit-usernames"
+    #channel_name = process.env.CHANNEL_NAME
     #database_file_name = "reddit_members"
     #database_file_dir = "./reddit/datastore"
     #attempts = []
 
     invoke = (object, action) => {
         switch(action) {
-            case botState.GUILD_MEMBER_REMOVE: 
-                this.#handleGuildMemberRemove(object);
-                break;
-            case botState.GUILD_MEMBER_ADD:
-                this.#handleGuildMemberAdd(object);
-                break;
-            default:
+            case botState.MESSAGE: 
                 this.#handleMessage(object);
                 break;
+            default:
+                return;
         }
     }
-
-    #handleGuildMemberRemove = member => {
-        const db = new Database(this.#database_file_name, this.#database_file_dir);
-        db.select("member", "author", member.user.id, resp => {
-            if(resp.state == db.state.SUCCESS) {
-                this.#handleRemoveContributor(resp.row.reddit_name, response => {
-                    if(response == state.SUCCESS) console.log(`removed contributor with id ${member.user.id} and username ${member.user.username}: ${resp.row.reddit_name}`)
-                });
-            }
-        });
-    }
-
-    #handleGuildMemberAdd = member => {
-        const db = new Database(this.#database_file_name, this.#database_file_dir);
-        db.select("member", "author", member.user.id, resp => {
-            if(resp.state == db.state.SUCCESS && resp.row != null) {
-                this.#handleAddContributor(resp.row.reddit_name, response => {
-                    if(response == state.SUCCESS) {
-                        console.log(`added contributor with id ${member.user.id} and username ${member.user.username}: ${resp.row.reddit_name}`)
-                        member.user.send(`***Hi welcome back to the everyday astronaut discord!*** \n\nSince you've been here before and we know you were subsribed to the subreddit, we've automatically given you access with the user ${resp.row.reddit_name}. \n\nIf this is no longer your username don't worry! In the #${this.#channel_name} you can simply type !resubscribe with your new username and it will subscribe you with the new username.\n`)
-                    }
-                });
-            }
-        });
-    }
-
     #handleMessage = (msg) => {
         if(!msg.content.startsWith(process.env.PREFIX) || msg.channel.name != this.#channel_name) {
-            removeMessage(msg, "COMMAND/CHANNEL");
             return;
-        }
-        
-        const parameters =  msg.content.split(" ");
-        const cmd = parameters[0].replace("!", "");
-        const username = parameters[1];
-
-        if(!this.#validateMessage(cmd, username)) {
-            removeMessage(msg, "USERNAME");
-            return;
-        } 
-        
-        if(typeof this.#attempts[username] == "undefined") this.#attempts[username] = 1
-        if(cmd == commands.SUBSCRIBE) {
-            this.#handleSubscribe(msg, username);
-        } else if(cmd == commands.RESUBSCRIBE) {
-            this.#handleResubscribe(msg, username);
         } else {
-            removeMessage(msg, "COMMAND")
+            const parameters =  msg.content.split(" ");
+            const cmd = parameters[0].replace("!", "");
+            const username = parameters[1];
+    
+            if(!this.#validateMessage(cmd, username)) {
+                removeMessage(msg, "USERNAME");
+                return;
+            } 
+            
+            if(typeof this.#attempts[username] == "undefined") this.#attempts[username] = 1
+            if(cmd == commands.SUBSCRIBE) {
+                this.#handleSubscribe(msg, username);
+            } else if(cmd == commands.RESUBSCRIBE) {
+                this.#handleResubscribe(msg, username);
+            } else {
+                removeMessage(msg, "COMMAND")
+            }
         }
     }
 
