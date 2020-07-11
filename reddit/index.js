@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 const botState = require('../bot/enum/state.js');
+const type = require('../bot/enum/type.js');
 const commands = require('./enum/command.js');
 const state = require('./enum/state.js');
 const {sendCreatorMessage, removeMessage} = require('../common/message.js');
@@ -20,22 +21,28 @@ class Reddit {
         userAgent: "SaturnServer"
     });
 
-    #subreddit = this.#reddit.getSubreddit("Subscriber_Reddit");
+    #subreddit = this.#reddit.getSubreddit(process.env.REDDIT_SUBREDDIT);
     #discord;
-    #channel_name = process.env.CHANNEL_NAME
+    #channel_name = process.env.DISCORD_CHANNEL_NAME
     #database_file_name = "reddit_members"
     #database_file_dir = "./reddit/datastore"
     #attempts = []
 
-    invoke = (object, action) => {
+    invoke = (object, action, user) => {
         switch(action) {
             case botState.MESSAGE: 
-                this.#handleMessage(object);
+                if(user == type.BOT) this.#handleBotMessage(object);
+                else this.#handleMessage(object);
                 break;
             default:
                 return;
         }
     }
+
+    #handleBotMessage = (msg) => {
+        setTimeout(_ => removeMessage(msg, "CLEANUP"), 5000);
+    }
+
     #handleMessage = (msg) => {
         if(!msg.content.startsWith(process.env.PREFIX) || msg.channel.name != this.#channel_name) {
             return;
@@ -176,6 +183,10 @@ class Reddit {
                 this.#attempts[username] = 0;
                 break;
         }
+        
+        setTimeout(_ => {
+            if(!msg.pinned) removeMessage(msg, "CLEANUP")
+        }, 5000)
     }
 }
 

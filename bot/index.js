@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
 const Reddit = require('../reddit/index.js');
 const state = require('./enum/state.js');
-const sendCreatorMessage = require('../common/message.js');
+const type = require('./enum/type.js');
+const {sendCreatorMessage, removeMessage} = require('../common/message.js');
 const dotenv = require('dotenv');
 
 env = dotenv.config();
@@ -9,10 +10,10 @@ const bot = new Discord.Client();
 const reddit = new Reddit(bot);
 
 bot.on("message", msg => {
-    if(msg.author.bot) return;
+    if(msg.author.bot) reddit.invoke(msg, state.MESSAGE, type.BOT);
 
     try {
-        reddit.invoke(msg, state.MESSAGE);
+        reddit.invoke(msg, state.MESSAGE, type.USER);
     } catch(e) {
         sendCreatorMessage(
             bot, 
@@ -26,7 +27,7 @@ bot.on('guildMemberAdd', member => {
     if(msg.author.bot) return;
 
     try {
-        reddit.invoke(member, state.GUILD_MEMBER_ADD);
+        reddit.invoke(member, state.GUILD_MEMBER_ADD, type.USER);
     } catch(e) {
         sendCreatorMessage(
             bot, 
@@ -40,7 +41,7 @@ bot.on('guildMemberRemove', member => {
     if(msg.author.bot) return;
 
     try {
-        reddit.invoke(member, state.GUILD_MEMBER_REMOVE);
+        reddit.invoke(member, state.GUILD_MEMBER_REMOVE, type.USER);
     } catch(e) {
         sendCreatorMessage(
             bot, 
