@@ -146,16 +146,16 @@ class Reddit {
     #handleRedditState = (msg, receivedState, username) => {
         switch(receivedState) {
             case state.USER_NOT_FOUND: 
-                msg.reply("The username you provided was not found please try again :smile:");
+                msg.reply("The username you provided was not found, please try again :smile:");
                 this.#attempts[username] = 0;
                 break;
             case state.ALREADY_SUBSCRIBED: 
-                msg.reply(`You are already subscribed to the subreddit according to our systems, If you want to change the user which has access to the subreddit then use the command !resubscribe ${username}`);
+                msg.reply(`You are already subscribed to the subreddit according to our systems. If you want to change the user which has access to the subreddit then use the command !resubscribe ${username}`);
                 this.#attempts[username] = 0;
                 break;
             case state.FAILURE:
                 if(this.#attempts[username] == 3) {
-                    msg.reply(":robot: Hmm something went wrong, I might be broken I have contacted my creator.");
+                    msg.reply(":robot: Hmm something went wrong, I might be broken so I have contacted my creator.");
                     sendCreatorMessage(
                         this.#discord,
                         `ADD TO SUBREDDIT ERROR`,
@@ -168,11 +168,11 @@ class Reddit {
                 }
                 break;
             case state.NOT_YET_SUBSCRIBED:
-                msg.reply(`You are not yet subscribed please use the !subscribe ${username} commmand to subscribe :wink:`);
+                msg.reply(`You are not yet subscribed. Please use the !subscribe ${username} command to subscribe :wink:`);
                 this.#attempts[username] = 0;
                 break;
             default:
-                msg.reply(`Great! You're all set, you now have access to the subreddit with the account ${username}`);
+                msg.reply(`Great! You’re all set, you now have access to the subreddit with the account ${username}`);
                 this.#attempts[username] = 0;
                 break;
         }
