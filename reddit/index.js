@@ -28,6 +28,8 @@ class Reddit {
     #database_file_dir = "./reddit/datastore"
     #attempts = []
 
+    #db = new Database(this.#database_file_name, this.#database_file_dir);
+
     invoke = (object, action, user) => {
         switch(action) {
             case botState.MESSAGE: 
@@ -68,21 +70,20 @@ class Reddit {
     }
 
     #handleSubscribe = (msg, username) => {
-        const db = new Database(this.#database_file_name, this.#database_file_dir);
-        db.select("member", "author", msg.author.id, response => {
+        this.#db.select("member", "author", msg.author.id, response => {
             if(response.row != null) this.#handleRedditState(msg, state.ALREADY_SUBSCRIBED, username)
             else {
-                db.insert("member", ["author", "reddit_name"], [msg.author.id, username], response => {
-                    if(response.state == db.state.SUCCESS) {
+                this.#db.insert("member", ["author", "reddit_name"], [msg.author.id, username], response => {
+                    if(response.state == this.#db.state.SUCCESS) {
                         this.#handleAddContributor(username, resp => {
                         
                             if(resp == state.USER_NOT_FOUND) {
-                                db.delete("member", "author", msg.author.id, _ => {});
+                                this.#db.delete("member", "author", msg.author.id, _ => {});
                             }
         
                             this.#handleRedditState(msg, resp, username);
                         });
-                    } else if(response.state == db.state.CONSTRAINT_ERROR) {
+                    } else if(response.state == this.#db.state.CONSTRAINT_ERROR) {
                         this.#handleRedditState(msg, state.ALREADY_SUBSCRIBED, username)
                     } else {
                         this.#handleRedditState(msg, state.FAILURE, username)
@@ -93,19 +94,18 @@ class Reddit {
     }
 
     #handleResubscribe = (msg, username) => {
-        const db = new Database(this.#database_file_name, this.#database_file_dir);
-        db.select("member", "author", msg.author.id, response => {
-            if(response.state == db.state.SUCCESS) {
+        this.#db.select("member", "author", msg.author.id, response => {
+            if(response.state == this.#db.state.SUCCESS) {
                 if(response.row == null) this.#handleRedditState(msg, state.NOT_YET_SUBSCRIBED, username)
                 else {
                     this.#handleRemoveContributor(username, _ => {});
-                    db.delete("member", "author", msg.author.id, _ => {});
-                    db.insert("member", ["author", "reddit_name"], [msg.author.id, username], _ => {
-                        if(response.state == db.state.SUCCESS) {
+                    this.#db.delete("member", "author", msg.author.id, _ => {});
+                    this.#db.insert("member", ["author", "reddit_name"], [msg.author.id, username], _ => {
+                        if(response.state == this.#db.state.SUCCESS) {
                             this.#handleAddContributor(username, resp => {
                                 if(resp == state.USER_NOT_FOUND) {
-                                    db.delete("member", "author", msg.author.id, _ => {});
-                                    db.insert("member", ["author", "reddit_name"], [msg.author.id, response.row.reddit_name], _ => {});
+                                    this.#db.delete("member", "author", msg.author.id, _ => {});
+                                    this.#db.insert("member", ["author", "reddit_name"], [msg.author.id, response.row.reddit_name], _ => {});
                                     this.#handleAddContributor(response.row.reddit_name, _ => {});
                                 }
             

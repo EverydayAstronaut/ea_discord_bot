@@ -14,7 +14,7 @@ class Database {
 
     constructor(file, dir) {
         this.#file = file;
-        this.#dir = dir;
+        this.#dir = dir;        
     }
     
     #errorHandling = (err, callback) => {
