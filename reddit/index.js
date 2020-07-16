@@ -42,7 +42,11 @@ class Reddit {
     }
 
     #handleBotMessage = (msg) => {
-        setTimeout(_ => removeMessage(msg, "CLEANUP"), 5000);
+        setTimeout(_ => {
+            if(msg.channe.name == this.#channel_name) {
+                removeMessage(msg, "CLEANUP")
+            }
+        }, 5000);
     }
 
     #handleMessage = (msg) => {
