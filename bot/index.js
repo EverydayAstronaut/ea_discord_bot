@@ -3,14 +3,15 @@ const Reddit = require('../reddit/index.js');
 const state = require('./enum/state.js');
 const type = require('./enum/type.js');
 const {sendCreatorMessage, removeMessage} = require('../common/message.js');
+const path = require('path'); 
 const dotenv = require('dotenv');
 
-env = dotenv.config();
+env = dotenv.config({path: path.join(__dirname, '.env')});
 const bot = new Discord.Client();
 const reddit = new Reddit(bot);
 
 bot.on("message", msg => {
-    if(msg.author.bot) reddit.invoke(msg, state.MESSAGE, type.BOT);
+    if(msg != "undefined" && msg.author.bot) reddit.invoke(msg, state.MESSAGE, type.BOT);
 
     try {
         reddit.invoke(msg, state.MESSAGE, type.USER);
