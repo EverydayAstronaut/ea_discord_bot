@@ -36,32 +36,53 @@ class Reddit {
                 if(user == type.BOT) this.#handleBotMessage(object);
                 else this.#handleMessage(object);
                 break;
+            case botState.STARTUP:
+                this.#cleanChannel(object);
+                return;
             default:
                 return;
         }
     }
 
+    #cleanChannel = (bot) => {
+        bot.channels.cache.filter(x => x.name == this.#channel_name).map(x => {
+            x.messages.fetch({limit:10}).then(messages => {
+                messages.forEach(message => {
+                    if(message.channel.name == this.#channel_name) {
+                        this.#db.select("member", "author", message.author.id, response => {
+                            if(response.row == null || message.content.startsWith(process.env.PREFIX) && message.content.includes("resubscribe")) { 
+                                this.#handleMessage(message)
+                                setTimeout(_ => {
+                                    removeMessage(message, `REDDIT | STARTUP CLEANUP | ${message.channel.name.toUpperCase()}`)
+                                }, 5000);
+                            } else {
+                                removeMessage(message, `REDDIT | STARTUP CLEANUP | ${message.channel.name.toUpperCase()}`)
+                            }
+                        });
+                    }
+                });
+            });
+        });
+        return;
+    }
+
     #handleBotMessage = (msg) => {
         setTimeout(_ => {
-            if(msg.channel.name == this.#channel_name) {
-                removeMessage(msg, "REDDIT | CLEANUP")
-            }
+            if(msg.channel.name == this.#channel_name) removeMessage(msg, `REDDIT | CLEANUP | ${msg.channel.name.toUpperCase()}`)
         }, 5000);
     }
 
     #handleMessage = (msg) => {
-        console.log(msg.author.bot);
         if(!msg.content.startsWith(process.env.PREFIX) || msg.channel.name != this.#channel_name) {
-            if(!msg.content.startsWith(process.env.PREFIX) && msg.channel.name == this.#channel_name && !msg.author.bot) removeMessage(msg, "REDDIT | COMMAND");
+            if(!msg.content.startsWith(process.env.PREFIX) && msg.channel.name == this.#channel_name && !msg.author.bot) removeMessage(msg, `REDDIT | COMMAND | ${msg.channel.name.toUpperCase()}`);
             return;
         } else {
-        
             const parameters =  msg.content.split(" ");
             const cmd = parameters[0].replace("!", "");
             const username = parameters[1];
     
             if(!this.#validateMessage(cmd, username)) {
-                removeMessage(msg, "REDDIT | USERNAME");
+                removeMessage(msg, `REDDIT | USERNAME | ${msg.channel.name.toUpperCase()}`);
                 return;
             } 
             
@@ -71,7 +92,7 @@ class Reddit {
             } else if(cmd == commands.RESUBSCRIBE) {
                 this.#handleResubscribe(msg, username);
             } else {
-                removeMessage(msg, "REDDIT | COMMAND")
+                removeMessage(msg, `REDDIT | COMMAND | ${msg.channel.name.toUpperCase()}`)
             }
         }
     }
@@ -192,7 +213,7 @@ class Reddit {
         }
         
         setTimeout(_ => {
-            if(!msg.pinned) removeMessage(msg, "REDDIT | CLEANUP")
+            if(!msg.pinned) removeMessage(msg, `REDDIT | CLEANUP | ${msg.channel.name.toUpperCase()}`)
         }, 5000)
     }
 }

@@ -52,4 +52,8 @@ bot.on('guildMemberRemove', member => {
     }
 });
 
+bot.on('ready', _ => {
+    reddit.invoke(bot, state.STARTUP, type.BOT)
+})
+
 bot.login(process.env.DISCORD_TOKEN);
