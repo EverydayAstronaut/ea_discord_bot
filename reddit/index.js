@@ -44,21 +44,24 @@ class Reddit {
     #handleBotMessage = (msg) => {
         setTimeout(_ => {
             if(msg.channel.name == this.#channel_name) {
-                removeMessage(msg, "CLEANUP")
+                removeMessage(msg, "REDDIT | CLEANUP")
             }
         }, 5000);
     }
 
     #handleMessage = (msg) => {
+        console.log(msg.author.bot);
         if(!msg.content.startsWith(process.env.PREFIX) || msg.channel.name != this.#channel_name) {
+            if(!msg.content.startsWith(process.env.PREFIX) && msg.channel.name == this.#channel_name && !msg.author.bot) removeMessage(msg, "REDDIT | COMMAND");
             return;
         } else {
+        
             const parameters =  msg.content.split(" ");
             const cmd = parameters[0].replace("!", "");
             const username = parameters[1];
     
             if(!this.#validateMessage(cmd, username)) {
-                removeMessage(msg, "USERNAME");
+                removeMessage(msg, "REDDIT | USERNAME");
                 return;
             } 
             
@@ -68,7 +71,7 @@ class Reddit {
             } else if(cmd == commands.RESUBSCRIBE) {
                 this.#handleResubscribe(msg, username);
             } else {
-                removeMessage(msg, "COMMAND")
+                removeMessage(msg, "REDDIT | COMMAND")
             }
         }
     }
@@ -189,7 +192,7 @@ class Reddit {
         }
         
         setTimeout(_ => {
-            if(!msg.pinned) removeMessage(msg, "CLEANUP")
+            if(!msg.pinned) removeMessage(msg, "REDDIT | CLEANUP")
         }, 5000)
     }
 }
