@@ -24,6 +24,7 @@ class Reddit {
     #subreddit = this.#reddit.getSubreddit(process.env.REDDIT_SUBREDDIT);
     #discord;
     #channel_name = process.env.DISCORD_CHANNEL_NAME
+    #delete_delay = process.env.REDDIT_DELETE_TIMEOUT * 1000
     #database_file_name = "reddit_members"
     #database_file_dir = "./reddit/datastore"
     #attempts = []
@@ -54,7 +55,7 @@ class Reddit {
                                 this.#handleMessage(message)
                                 setTimeout(_ => {
                                     removeMessage(message, `REDDIT | STARTUP CLEANUP | ${message.channel.name.toUpperCase()}`)
-                                }, 5000);
+                                }, this.#delete_delay);
                             } else {
                                 removeMessage(message, `REDDIT | STARTUP CLEANUP | ${message.channel.name.toUpperCase()}`)
                             }
@@ -69,7 +70,7 @@ class Reddit {
     #handleBotMessage = (msg) => {
         setTimeout(_ => {
             if(msg.channel.name == this.#channel_name) removeMessage(msg, `REDDIT | CLEANUP | ${msg.channel.name.toUpperCase()}`)
-        }, 5000);
+        },  this.#delete_delay);
     }
 
     #handleMessage = (msg) => {
@@ -214,7 +215,7 @@ class Reddit {
         
         setTimeout(_ => {
             if(!msg.pinned) removeMessage(msg, `REDDIT | CLEANUP | ${msg.channel.name.toUpperCase()}`)
-        }, 5000)
+        }, this.#delete_delay)
     }
 }
 
