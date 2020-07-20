@@ -75,7 +75,7 @@ class Reddit {
 
     #handleMessage = (msg) => {
         if(!msg.content.startsWith(process.env.PREFIX) || msg.channel.name != this.#channel_name) {
-            if(!msg.content.startsWith(process.env.PREFIX) && msg.channel.name == this.#channel_name && !msg.author.bot) removeMessage(msg, `REDDIT | COMMAND | ${msg.channel.name.toUpperCase()}`);
+            if(!msg.content.startsWith(process.env.PREFIX) && msg.channel.name == this.#channel_name && !msg.author.bot && !(msg.member.roles.cache.find(role => role.name === 'Admin' || role.name === 'Mod'))) removeMessage(msg, `REDDIT | COMMAND | ${msg.channel.name.toUpperCase()}`);
             return;
         } else {
             const parameters =  msg.content.split(" ");
