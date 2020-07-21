@@ -25,7 +25,7 @@ bot.on("message", msg => {
 });
 
 bot.on('guildMemberAdd', member => {
-    if(msg.author.bot) return;
+    if(member.author.bot) return;
 
     try {
         reddit.invoke(member, state.GUILD_MEMBER_ADD, type.USER);
@@ -39,7 +39,7 @@ bot.on('guildMemberAdd', member => {
 });
 
 bot.on('guildMemberRemove', member => {
-    if(msg.author.bot) return;
+    if(member.author.bot) return;
 
     try {
         reddit.invoke(member, state.GUILD_MEMBER_REMOVE, type.USER);
