@@ -80,7 +80,7 @@ class Reddit {
         } else {
             const parameters =  msg.content.split(" ");
             const cmd = parameters[0].replace("!", "");
-            const username = parameters[1];
+            const username = parameters[1].replace("u/", "");
     
             if(!this.#validateMessage(cmd, username)) {
                 removeMessage(msg, `REDDIT | USERNAME | ${msg.channel.name.toUpperCase()}`);
