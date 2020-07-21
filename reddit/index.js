@@ -98,11 +98,12 @@ class Reddit {
         }
     }
 
-    #handleSubscribe = (msg, username) => {
+    #handleSubscribe = (msg, username) => { 
+        const date = new Date().toUTCString();       
         this.#db.select("member", "author", msg.author.id, response => {
             if(response.row != null) this.#handleRedditState(msg, state.ALREADY_SUBSCRIBED, username)
             else {
-                this.#db.insert("member", ["author", "reddit_name"], [msg.author.id, username], response => {
+                this.#db.insert("member", ["dateUTC", "author", "reddit_name"], [date, msg.author.id, username], response => {
                     if(response.state == this.#db.state.SUCCESS) {
                         this.#handleAddContributor(username, resp => {
                         
@@ -123,18 +124,19 @@ class Reddit {
     }
 
     #handleResubscribe = (msg, username) => {
+        const date = new Date().toUTCString();
         this.#db.select("member", "author", msg.author.id, response => {
             if(response.state == this.#db.state.SUCCESS) {
                 if(response.row == null) this.#handleRedditState(msg, state.NOT_YET_SUBSCRIBED, username)
                 else {
                     this.#handleRemoveContributor(username, _ => {});
                     this.#db.delete("member", "author", msg.author.id, _ => {});
-                    this.#db.insert("member", ["author", "reddit_name"], [msg.author.id, username], _ => {
+                    this.#db.insert("member", ["dateUTC", "author", "reddit_name"], [date, msg.author.id, username], _ => {
                         if(response.state == this.#db.state.SUCCESS) {
                             this.#handleAddContributor(username, resp => {
                                 if(resp == state.USER_NOT_FOUND) {
                                     this.#db.delete("member", "author", msg.author.id, _ => {});
-                                    this.#db.insert("member", ["author", "reddit_name"], [msg.author.id, response.row.reddit_name], _ => {});
+                                    this.#db.insert("member", ["dateUTC", "author", "reddit_name"], [date, msg.author.id, response.row.reddit_name], _ => {});
                                     this.#handleAddContributor(response.row.reddit_name, _ => {});
                                 }
             
