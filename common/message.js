@@ -5,8 +5,7 @@ const sendCreatorMessage = (discord, title, msg) => {
 
 const checkDeletePermission = (msg) => {
     const pinned = msg.pinned;
-    const hasPermissions = !!(msg.member.roles.cache.find(role => role.name === 'Admin' || role.name === 'Mod'));
-    return !(pinned & hasPermissions);
+    return !(pinned);
 }
 
 const removeMessage = (msg, reason) => {
