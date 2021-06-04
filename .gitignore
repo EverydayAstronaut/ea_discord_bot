@@ -6,6 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+*.db
+
 # stupid mac with it's stupid .DS_Store
 *.DS_Store
 

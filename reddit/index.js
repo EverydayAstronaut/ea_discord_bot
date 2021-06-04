@@ -166,10 +166,11 @@ class Reddit {
         this.#subreddit.removeContributor({name: username}).then(_ => {
             callback(state.SUCCESS)
         }).catch(err => {
+            console.log(err);
             sendCreatorMessage(
                 this.#discord,
-                `ERROR REMOVING PERMISSIONS`
-                `the bot was unable to remove the reddit permissions of user ${author.id}`
+                `ERROR REMOVING PERMISSIONS`,
+                `the bot was unable to remove the reddit permissions of user ${username}`
             )
             callback(state.FAILURE)
         });
